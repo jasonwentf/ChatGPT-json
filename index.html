@@ -15,6 +15,14 @@
   --sidebar-width: 320px;
   --code-bg: #f4f4f5;
   --state-bg: #fef3c7;
+  --chat-bg: #f5f7fb;
+  --bubble-user: #ffffff;
+  --bubble-assistant: #f1f5ff;
+  --bubble-border: rgba(15, 23, 42, 0.08);
+  --avatar-user: #2563eb;
+  --avatar-assistant: #10b981;
+  --banner-bg: #fff7ed;
+  --banner-border: #fdba74;
 }
 
 body.dark {
@@ -25,6 +33,14 @@ body.dark {
   --shadow-color: rgba(0, 0, 0, 0.35);
   --code-bg: #27272a;
   --state-bg: #374151;
+  --chat-bg: #111827;
+  --bubble-user: #1f2937;
+  --bubble-assistant: #111827;
+  --bubble-border: rgba(148, 163, 184, 0.25);
+  --avatar-user: #60a5fa;
+  --avatar-assistant: #34d399;
+  --banner-bg: rgba(250, 204, 21, 0.12);
+  --banner-border: rgba(250, 204, 21, 0.35);
 }
 
 * {
@@ -51,12 +67,53 @@ header {
   flex-wrap: wrap;
 }
 
+header .title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
 header h1 {
   margin: 0;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+.active-conversation {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: rgba(31, 41, 55, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark .active-conversation {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.active-conversation .label {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.active-conversation .separator {
+  opacity: 0.6;
+}
+
+@media (max-width: 600px) {
+  header .title-group {
+    width: 100%;
+  }
+  .active-conversation {
+    font-size: 0.8rem;
+  }
 }
 
 header h1 span.logo {
@@ -211,6 +268,10 @@ section#conversation header.conversation-header h2 {
   margin: 0;
 }
 
+section#conversation header.conversation-header h2:empty {
+  display: none;
+}
+
 section#conversation header.conversation-header .meta {
   font-size: 0.85rem;
   opacity: 0.75;
@@ -222,79 +283,150 @@ section#conversation header.conversation-header .meta {
 .timeline {
   flex: 1;
   overflow-y: auto;
-  padding: 1.25rem;
+  background: var(--chat-bg);
+  padding: 2rem 0 3rem;
+}
+
+.timeline-content {
+  max-width: 860px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  gap: 1.75rem;
+  padding: 0 1.5rem;
+}
+
+.chat-row {
+  display: flex;
   gap: 1rem;
+  align-items: flex-start;
 }
 
-.message {
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 3px 8px var(--shadow-color);
-  background: rgba(255, 255, 255, 0.85);
-  position: relative;
-}
-
-body.dark .message {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.message.user {
-  border-left: 4px solid var(--accent-color);
-}
-
-.message.assistant {
-  border-left: 4px solid #22c55e;
-}
-
-.message .role {
-  font-weight: 600;
-  margin-bottom: 0.35rem;
+.chat-row .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  font-weight: 600;
+  color: #fff;
+  background: var(--avatar-user);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
 }
 
-.message .timestamp {
-  font-size: 0.75rem;
-  opacity: 0.65;
+.chat-row.assistant .avatar {
+  background: var(--avatar-assistant);
 }
 
-.message .content {
-  line-height: 1.6;
-  overflow-x: auto;
-}
-
-.message .branch-controls {
-  margin-top: 0.6rem;
+.chat-row .bubble {
+  background: var(--bubble-user);
+  border: 1px solid var(--bubble-border);
+  border-radius: 18px;
+  padding: 1.1rem 1.2rem;
+  width: 100%;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
   display: flex;
-  justify-content: flex-end;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
-.branch-controls button {
-  font-size: 0.75rem;
-  padding: 0.35rem 0.6rem;
+.chat-row.assistant .bubble {
+  background: var(--bubble-assistant);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.bubble-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  color: rgba(17, 24, 39, 0.75);
+}
+
+body.dark .bubble-header {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.role-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: inherit;
+}
+
+.model-label {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-color);
+  padding: 0.1rem 0.45rem;
   border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
-.message .branch-info {
+body.dark .model-label {
+  background: rgba(96, 165, 250, 0.18);
+}
+
+.time-label {
+  margin-left: auto;
   font-size: 0.75rem;
   opacity: 0.75;
 }
 
-.state-banner {
-  border-left: 4px solid #f59e0b;
-  background: var(--state-bg);
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  font-size: 0.85rem;
+.bubble-body {
+  line-height: 1.65;
+  font-size: 0.98rem;
+}
+
+.bubble-body pre {
+  background: var(--code-bg);
+  padding: 0.9rem;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.branch-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.branch-controls button {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+}
+
+.branch-info {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-right: auto;
+}
+
+.system-banner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.system-banner .banner-content {
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
   line-height: 1.5;
-  box-shadow: 0 2px 6px var(--shadow-color);
+  color: inherit;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.timeline-empty {
+  text-align: center;
+  opacity: 0.6;
+  padding: 3rem 1.5rem;
 }
 
 .details-raw {
@@ -417,7 +549,14 @@ body.dark .image-placeholder {
 </head>
 <body>
 <header>
-  <h1><span class="logo">CJ</span>ChatGPT JSON Viewer</h1>
+  <div class="title-group">
+    <h1><span class="logo">CJ</span>ChatGPT JSON Viewer</h1>
+    <div id="active-conversation" class="active-conversation" hidden>
+      <span id="active-conversation-title" class="label"></span>
+      <span class="separator">·</span>
+      <span id="active-conversation-file"></span>
+    </div>
+  </div>
   <div class="controls">
     <button class="menu-toggle" type="button" aria-label="切换会话列表">☰</button>
     <label class="button secondary" for="file-input">📁 选择文件</label>
@@ -445,7 +584,9 @@ body.dark .image-placeholder {
         <h2 id="conversation-title"></h2>
         <div class="meta" id="conversation-meta"></div>
       </header>
-      <div class="timeline" id="timeline"></div>
+      <div class="timeline" id="timeline">
+        <div class="timeline-content" id="timeline-content"></div>
+      </div>
       <div class="details-raw">
         <details>
           <summary>查看原始 JSON</summary>
@@ -457,14 +598,50 @@ body.dark .image-placeholder {
 </main>
 <div id="live-region" role="status" aria-live="polite" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"></div>
 
-<!-- Marked.js (UMD, trimmed build for inline usage) -->
+<!-- Simple Markdown Parser -->
 <script>
-/*! marked@12.0.1 | https://marked.js.org */
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).marked=t()}(this,function(){"use strict";function e(){return e=Object.assign?Object.assign.bind():function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},e.apply(this,arguments)}const t={newline:/^\n+/,code:/^( {4}|\t)[^\n]*(?:\n(?: {4}|\t)[^\n]*)*/,fences:/^ {0,3}(`{3,}|~{3,})([^\n]*)\n(?:([\s\S]*?)\n)? {0,3}\1 *(?:\n+|$)/,heading:/^ {0,3}(#{1,6}) +([^\n]*?)(?: +#+)? *(?:\n+|$)/,hr:/^ {0,3}(?:(?:-+|\*+|_+) *){3,}(?:\n+|$)/,blockquote:/^( {0,3}> ?[^\n]+(?:\n[^\n]+)*)\n*/,list:/^( {0,3})(bull)(?: [^\n]+)?(?:\n(?!\1bull )[\s\S])*?(?:\n|$)/,html:/^ {0,3}<(tag)(?:"[^"]*"|'[^']*'|[^'">])*?>\n?/,def:/^ {0,3}\[(label)\]: *(?:<([^>]*)>|([^\n]*))(?: *(?:\n|$))*/,paragraph:/^((?:[^\n]+\n?)(?!hr|heading|blockquote|fences|list|html|def))+\n*/,text:/^[^\n]+/};t.bullet=/(?:[*+-]|\d+\.)/;const n={escape:/^\\([!\\"#$%&'()*+,./:;<=>?@[\]^_`{|}~-])/,code:/^(`+)([^`]*?[^`])\1(?!`)/,autolink:/^<([^ <>@]+@[^ <>@]+)>/,url:/^https?:\/\/[\w./?=#%:&+-]+/,tag:/^<\/?[A-Za-z][^>]*>/,link:/^!?\[(label)\]\(([^\s)]+)(?: +"([^"]+)")?\)/,reflink:/^!?\[(label)\]\[(.*?)\]/,nolink:/^!?\[(label)\]/,strong:/^(?:__([\s\S]+?)__|\*\*([\s\S]+?)\*\*)(?!\*)/,em:/^(?:_([\s\S]+?)_|\*([\s\S]+?)\*)(?!\*)/,strike:/^~~(?=([^~]|~(?!~))+~~)([\s\S]+?)~~/,br:/^ {2,}\n|^\\\n/,text:/^[\s\S]+?(?=[\\<!`*\[_~]|$)/};n._label=/(?:\\\\|[^\[\]])+/,n.label=new RegExp("^"+n._label.source);class r{constructor(e){this.tokens=[],this.tokens.links=Object.create(null),this.options=e||{}}tokenize(e){for(let n,r=e;e;)if((n=this.fences(r))||(n=this.code(r))||(n=this.heading(r))||(n=this.hr(r))||(n=this.blockquote(r))||(n=this.list(r))||(n=this.html(r))||(n=this.def(r))||(n=this.paragraph(r))||(n=this.text(r)))r=r.substring(n.raw.length);else if(r){const e=r.charCodeAt(0);if(13===e||10===e){r=r.substring(1);continue}throw new Error("Infinite loop on byte: "+e)}return this.tokens}space(e){const t=e.match(/^\n+/);if(t)return{type:"space",raw:t[0]}}code(e){const n=this.options;let r;return(r=t.fences.exec(e))?{type:"code",raw:r[0],lang:r[2]?r[2].trim():void 0,text:(r[3]||"").replace(/\n+$/,""),fenced:!0}:{type:"code",raw:(r=t.code.exec(e))?r[0]:void 0,text:r?r[0].replace(/^ {4}|\t/gm,""):
-void 0}}heading(e){const n=t.heading.exec(e);if(!n)return;const r={type:"heading",raw:n[0],depth:n[1].length,text:n[2]};return r.tokens=this.inlineTokens(r.text,[]),r}hr(e){const n=t.hr.exec(e);if(n)return{type:"hr",raw:n[0]}}blockquote(e){const n=t.blockquote.exec(e);if(!n)return;const r={type:"blockquote",raw:n[0].trimEnd(),tokens:[]};const i=n[0].replace(/^ *> ?/gm,"");return r.tokens=this.blockTokens(i,[]),r}list(e){const n=t.list.exec(e);if(!n)return;const r=n[1],i=n[2],o=i.length>1,a={type:"list",raw:n[0],ordered:o,start:o?+i.slice(0,-1):void 0,items:[]};const s=n[0].match(/^( {0,3})(bull)(?: [^\n]+)?(?:\n(?!\1bull )[\s\S])*?(?:\n|$)/gm);if(!s)return;for(const e of s){const t=e.replace(/^ {0,3}(?:bull) ?/,""),n=this.blockTokens(t,[]);a.items.push({type:"list_item",raw:e,tokens:n})}return a}html(e){const n=t.html.exec(e);if(n)return{type:"html",raw:n[0]}}def(e){const n=t.def.exec(e);if(!n)return;return this.tokens.links[n[1].toLowerCase()]={href:n[2]||n[3],title:n[4]}, {type:"def",raw:n[0]}}paragraph(e){const n=t.paragraph.exec(e);if(n)return{type:"paragraph",raw:n[0],text:n[0].trimEnd(),tokens:this.inlineTokens(n[0].trimEnd(),[])} }text(e){const n=t.text.exec(e);if(n)return{type:"text",raw:n[0],text:n[0],tokens:this.inlineTokens(n[0],[])} }blockTokens(e){const t=new r(this.options);return t.tokens=this.tokens,t.tokenize(e)}inlineTokens(e,t){const r=[];let i=e;for(;i;)if((n.escape.exec(i))){const e=i.match(n.escape);r.push({type:"escape",raw:e[0],text:e[1]}),i=i.substring(e[0].length);continue}if((n.code.exec(i))){const e=i.match(n.code);r.push({type:"codespan",raw:e[0],text:e[2]}),i=i.substring(e[0].length);continue}if((n.autolink.exec(i))){const e=i.match(n.autolink);let t="";const n=e[1];t=n.indexOf("@")>0?"mailto:"+n:n,r.push({type:"link",raw:e[0],href:t,text:n,tokens:[{type:"text",raw:n,text:n}]});i=i.substring(e[0].length);continue}if((n.url.exec(i))){const e=i.match(n.url);r.push({type:"link",raw:e[0],href:e[0],text:e[0],tokens:[{type:"text",raw:e[0],text:e[0]}]}),i=i.substring(e[0].length);continue}if((n.tag.exec(i))){const e=i.match(n.tag);r.push({type:"html",raw:e[0]}),i=i.substring(e[0].length);continue}if((n.link.exec(i))){const e=i.match(n.link);r.push({type:e[0].startsWith("!")?"image":"link",raw:e[0],href:e[2],title:e[3],text:e[1],tokens:this.inlineTokens(e[1],[])}),i=i.substring(e[0].length);continue}if((n.strong.exec(i))){const e=i.match(n.strong);const t=e[1]||e[2];r.push({type:"strong",raw:e[0],text:t,tokens:this.inlineTokens(t,[])}),i=i.substring(e[0].length);continue}if((n.em.exec(i))){const e=i.match(n.em);const t=e[1]||e[2];r.push({type:"em",raw:e[0],text:t,tokens:this.inlineTokens(t,[])}),i=i.substring(e[0].length);continue}if((n.strike.exec(i))){const e=i.match(n.strike);const t=e[1];r.push({type:"del",raw:e[0],text:t,tokens:this.inlineTokens(t,[])}),i=i.substring(e[0].length);continue}if((n.br.exec(i))){const e=i.match(n.br);r.push({type:"br",raw:e[0]}),i=i.substring(e[0].length);continue}const o=i.match(n.text);if(o){i=i.substring(o[0].length);const e=o[0];r.push({type:"text",raw:e,text:e})}else i=""}return r}}
-const i=new r;function o(t){const n=i.tokenize(t);const r=[];const o=e=>{switch(e.type){case"space":return"";case"hr":return"<hr/>";case"heading":return`<h${e.depth}>${o({type:"span",tokens:e.tokens})}</h${e.depth}>`;case"code":return`<pre><code class="language-${e.lang||""}">${a(e.text)}</code></pre>`;case"blockquote":return`<blockquote>${e.tokens.map(o).join("")}</blockquote>`;case"list":return`<${e.ordered?"ol":"ul"}>${e.items.map(t=>`<li>${t.tokens.map(o).join("")}</li>`).join("")}</${e.ordered?"ol":"ul"}>`;case"html":return e.raw;case"paragraph":return`<p>${o({type:"span",tokens:e.tokens})}</p>`;case"text":return a(e.text);case"codespan":return`<code>${a(e.text)}</code>`;case"strong":return`<strong>${o({type:"span",tokens:e.tokens})}</strong>`;case"em":return`<em>${o({type:"span",tokens:e.tokens})}</em>`;case"del":return`<del>${o({type:"span",tokens:e.tokens})}</del>`;case"link":return`<a href="${a(e.href)}"${e.title?` title="${a(e.title)}"`:""}>${o({type:"span",tokens:e.tokens})}</a>`;case"image":return`<img src="${a(e.href)}" alt="${a(e.text)}"${e.title?` title="${a(e.title)}"`:""}/>`;case"br":return"<br/>";case"span":return e.tokens.map(o).join("");default:return""}};return n.forEach(e=>{const t=o(e);t&&r.push(t)}),r.join("\n")}
-function a(e){return e.replace(/[&<>"']/g,(e=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[e])))}
-return{parse:o}});
+function simpleMarkdownParser(text) {
+  // Basic markdown parsing - just enough for this application
+  let html = text;
+  
+  // Headers
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  
+  // Bold
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  
+  // Italic
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+  
+  // Code blocks
+  html = html.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  
+  // Line breaks
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  
+  // Clean up empty paragraphs
+  html = html.replace(/<p><\/p>/g, '');
+  html = html.replace(/<p>(<h[1-6]>)/g, '$1');
+  html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<pre>)/g, '$1');
+  html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+  
+  return html;
+}
+
+// Simple marked-like object for compatibility
+window.marked = {
+  parse: simpleMarkdownParser
+};
 </script>
 
 <!-- Lightweight highlight.js-compatible stub -->
@@ -473,7 +650,7 @@ return{parse:o}});
 (function(){
   const KEYWORDS = {
     javascript: /\b(const|let|var|function|return|if|else|for|while|class|extends|new|try|catch|import|from|export|async|await)\b/g,
-    json: /"(\\\"|[^"])*"(?=\s*:)|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+    json: /"(\\\"|[^\"])*"(?=\s*:)|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
     python: /\b(def|class|return|if|elif|else|for|while|import|from|as|try|except|with|lambda|yield|True|False|None)\b/g,
     bash: /\b(echo|cd|ls|cat|mkdir|rm|touch|for|do|done|if|then|fi|elif|else|while)\b/g
   };
@@ -529,7 +706,7 @@ return{parse:o}});
 /*! Minimal KaTeX stub for offline rendering */
 (function(){
   function escapeHtml(str){
-    return str.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]);
+    return str.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
   }
   const katex = {
     render(tex, element){
@@ -597,14 +774,18 @@ return{parse:o}});
     conversationContent: document.getElementById('conversation-content'),
     conversationTitle: document.getElementById('conversation-title'),
     conversationMeta: document.getElementById('conversation-meta'),
-    timeline: document.getElementById('timeline'),
+    timeline: document.getElementById('timeline-content'),
+    timelineContainer: document.getElementById('timeline'),
     rawJson: document.getElementById('raw-json'),
     searchInput: document.getElementById('search-input'),
     errorContainer: document.getElementById('error-container'),
     toggleTheme: document.getElementById('toggle-theme'),
     menuToggle: document.querySelector('.menu-toggle'),
     sidebar: document.getElementById('sidebar'),
-    liveRegion: document.getElementById('live-region')
+    liveRegion: document.getElementById('live-region'),
+    activeConversationContainer: document.getElementById('active-conversation'),
+    activeConversationTitle: document.getElementById('active-conversation-title'),
+    activeConversationFile: document.getElementById('active-conversation-file')
   };
 
   const STORAGE_KEYS = {
@@ -685,6 +866,7 @@ return{parse:o}});
       elements.conversationList.innerHTML = '';
       elements.placeholder.hidden = false;
       elements.conversationContent.hidden = true;
+      elements.activeConversationContainer.hidden = true;
       return;
     }
     if(!currentConversationId){
@@ -707,6 +889,13 @@ return{parse:o}});
       li.innerHTML = `<div class="title">${escapeHtml(item.title || '未命名会话')}</div><div class="time">${formatDate(item.create_time)}</div>`;
       if(item.id === currentConversationId) li.classList.add('active');
       li.addEventListener('click', () => selectConversation(item.id));
+      li.tabIndex = 0;
+      li.addEventListener('keydown', event => {
+        if(event.key === 'Enter' || event.key === ' '){
+          event.preventDefault();
+          selectConversation(item.id);
+        }
+      });
       fragment.appendChild(li);
     });
     elements.conversationList.innerHTML = '';
@@ -734,16 +923,29 @@ return{parse:o}});
     elements.placeholder.hidden = true;
     elements.conversationContent.hidden = false;
 
-    elements.conversationTitle.textContent = conversation.title || '未命名会话';
-    const metaPieces = [];
-    if(conversation.create_time) metaPieces.push(`创建时间：${formatDate(conversation.create_time)}`);
-    if(conversation.update_time) metaPieces.push(`更新：${formatDate(conversation.update_time)}`);
-    metaPieces.push(`文件：${conversation.source || '未知'}`);
-    elements.conversationMeta.textContent = metaPieces.join(' · ');
+    const displayTitle = conversation.title || '未命名会话';
+    elements.conversationTitle.textContent = displayTitle;
+
+    // Update header info
+    elements.activeConversationTitle.textContent = displayTitle;
+    elements.activeConversationFile.textContent = conversation.source || '未知文件';
+    elements.activeConversationContainer.hidden = false;
+    elements.activeConversationContainer.title = `${displayTitle} · ${conversation.source || '未知文件'}`;
 
     elements.rawJson.textContent = JSON.stringify(conversation, null, 2);
 
-    renderConversation(conversation);
+    const renderInfo = renderConversation(conversation);
+    const metaPieces = [];
+    const firstTimestamp = renderInfo?.firstTimestamp ?? conversation.create_time ?? null;
+    const lastTimestamp = renderInfo?.lastTimestamp ?? conversation.update_time ?? null;
+    if(firstTimestamp) metaPieces.push(`开始：${formatDate(firstTimestamp)}`);
+    if(lastTimestamp && lastTimestamp !== firstTimestamp) metaPieces.push(`最后活动：${formatDate(lastTimestamp)}`);
+    if(renderInfo?.modelLabel) metaPieces.push(`模型：${renderInfo.modelLabel}`);
+    elements.conversationMeta.textContent = metaPieces.join(' · ');
+    if(metaPieces.length === 0){
+      elements.conversationMeta.textContent = '';
+    }
+
     updateConversationList();
 
     if(document.body.classList.contains('mobile')){
@@ -751,109 +953,209 @@ return{parse:o}});
     }
   }
 
-  function renderConversation(conversation){
-    const mapping = conversation.mapping || {};
-    if(!mapping || Object.keys(mapping).length === 0){
-      elements.timeline.innerHTML = '<p>会话中没有可显示的消息。</p>';
-      return;
-    }
+    function renderConversation(conversation){
+      const mapping = conversation.mapping || {};
+      if(!mapping || Object.keys(mapping).length === 0){
+        elements.timeline.innerHTML = '<div class="timeline-empty">会话中没有可显示的消息。</div>';
+        return { firstTimestamp: null, lastTimestamp: null, modelLabel: null };
+      }
 
-    const rootId = resolveRootId(mapping, conversation.current_node);
-    if(!rootId){
-      elements.timeline.innerHTML = '<p>无法解析会话结构。</p>';
-      return;
-    }
+      const rootId = resolveRootId(mapping, conversation.current_node);
+      if(!rootId){
+        elements.timeline.innerHTML = '<div class="timeline-empty">无法解析会话结构。</div>';
+        return { firstTimestamp: null, lastTimestamp: null, modelLabel: null };
+      }
 
-    const defaultPathSet = buildDefaultPathSet(mapping, conversation.current_node);
-    const activePath = buildActivePath(conversation.id, mapping, rootId, defaultPathSet);
-    const timelineFragment = document.createDocumentFragment();
+      const defaultPathSet = buildDefaultPathSet(mapping, conversation.current_node);
+      const activePath = buildActivePath(conversation.id, mapping, rootId, defaultPathSet);
+      const timelineFragment = document.createDocumentFragment();
+      let firstTimestamp = null;
+      let lastTimestamp = null;
+      let assistantModel = null;
+      let hasRenderableNode = false;
 
-    activePath.forEach(nodeId => {
-      const node = mapping[nodeId];
-      if(!node) return;
-      const message = node.message;
-      if(!message){
-        if(node?.state){
-          const banner = document.createElement('div');
-          banner.className = 'state-banner';
-          const status = node.state.status ? `<strong>${escapeHtml(node.state.status)}</strong>` : '状态更新';
-          banner.innerHTML = `${status}${node.state.status_details ? `<br>${escapeHtml(node.state.status_details)}` : ''}`;
-          timelineFragment.appendChild(banner);
+      activePath.forEach(nodeId => {
+        const node = mapping[nodeId];
+        if(!node) return;
+        const message = node.message;
+        if(!message){
+          if(node?.state){
+            const wrapper = document.createElement('div');
+            wrapper.className = 'system-banner';
+            const banner = document.createElement('div');
+            banner.className = 'banner-content';
+            const status = node.state.status ? `<strong>${escapeHtml(node.state.status)}</strong>` : '状态更新';
+            banner.innerHTML = `${status}${node.state.status_details ? `<br>${escapeHtml(node.state.status_details)}` : ''}`;
+            wrapper.appendChild(banner);
+            timelineFragment.appendChild(wrapper);
+            hasRenderableNode = true;
+          }
+          return;
         }
-        return;
-      }
 
-      if(message.recipient && message.recipient !== 'all'){
-        const banner = document.createElement('div');
-        banner.className = 'state-banner';
-        banner.innerHTML = `<strong>内部消息 (${escapeHtml(message.recipient)})</strong><br>${escapeHtml(extractPlainText(message))}`;
-        timelineFragment.appendChild(banner);
-        return;
-      }
-
-      const { author, content, create_time } = message;
-      const role = author?.role || 'unknown';
-      if(role !== 'user' && role !== 'assistant'){
-        if(author?.role && message?.recipient !== 'all'){
-          const banner = document.createElement('div');
-          banner.className = 'state-banner';
-          banner.textContent = `${author.role}: ${message.content?.parts?.join(' ') || '无内容'}`;
-          timelineFragment.appendChild(banner);
+        if(message.recipient && message.recipient !== 'all'){
+          return;
         }
-        return;
-      }
 
-      const relevantParts = normalizeContentParts(content);
-      if(relevantParts.length === 0){
-        return;
-      }
+        const { author, content, create_time } = message;
+        const role = author?.role || 'unknown';
+        if(role !== 'user' && role !== 'assistant'){
+          if(author?.role && message?.recipient !== 'all'){
+            const wrapper = document.createElement('div');
+            wrapper.className = 'system-banner';
+            const banner = document.createElement('div');
+            banner.className = 'banner-content';
+            banner.textContent = `${author.role}: ${message.content?.parts?.join(' ') || '无内容'}`;
+            wrapper.appendChild(banner);
+            timelineFragment.appendChild(wrapper);
+            hasRenderableNode = true;
+          }
+          return;
+        }
 
-      const article = document.createElement('article');
-      article.className = `message ${role}`;
-      article.innerHTML = `
-        <div class="role">
-          <span>${role === 'user' ? '用户' : '助手'}</span>
-          <span class="timestamp">${formatDate(create_time)}</span>
-        </div>
-        <div class="content"></div>
-      `;
+        const relevantParts = normalizeContentParts(content);
+        if(relevantParts.length === 0){
+          return;
+        }
 
-      const contentContainer = article.querySelector('.content');
-      relevantParts.forEach(part => {
-        if(part.type === 'text'){
-          const html = window.marked.parse(part.value);
-          const wrapper = document.createElement('div');
-          wrapper.innerHTML = html;
-          contentContainer.appendChild(wrapper);
-        } else if(part.type === 'image'){
-          const placeholder = document.createElement('div');
-          placeholder.className = 'image-placeholder';
-          const altText = part.meta ? `<br><small>${escapeHtml(JSON.stringify(part.meta))}</small>` : '';
-          placeholder.innerHTML = `<strong>🖼 图片资源：</strong><br>${escapeHtml(part.asset_pointer || '未知资源')}<br><em>原导出未包含图像，仅作占位。</em>${altText}`;
-          contentContainer.appendChild(placeholder);
+        const row = document.createElement('div');
+        row.className = `chat-row ${role}`;
+        row.dataset.role = role;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.textContent = getAvatarInitial(author?.name, role);
+        row.appendChild(avatar);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.setAttribute('data-role', role);
+        row.appendChild(bubble);
+
+        const header = document.createElement('div');
+        header.className = 'bubble-header';
+        bubble.appendChild(header);
+
+        const roleLabel = document.createElement('span');
+        roleLabel.className = 'role-label';
+        roleLabel.textContent = getRoleLabel(author?.name, role);
+        header.appendChild(roleLabel);
+
+        if(role === 'assistant'){
+          const modelLabel = getMessageModelLabel(message);
+          if(modelLabel){
+            const chip = document.createElement('span');
+            chip.className = 'model-label';
+            chip.textContent = modelLabel;
+            header.appendChild(chip);
+            if(!assistantModel) assistantModel = modelLabel;
+          }
+        }
+
+        const time = document.createElement('span');
+        time.className = 'time-label';
+        time.textContent = formatDate(create_time);
+        header.appendChild(time);
+
+        const contentContainer = document.createElement('div');
+        contentContainer.className = 'bubble-body';
+        bubble.appendChild(contentContainer);
+
+        relevantParts.forEach(part => {
+          if(part.type === 'text'){
+            const html = window.marked.parse(part.value);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html;
+            contentContainer.appendChild(wrapper);
+          } else if(part.type === 'image'){
+            const placeholder = document.createElement('div');
+            placeholder.className = 'image-placeholder';
+            const altText = part.meta ? `<br><small>${escapeHtml(JSON.stringify(part.meta))}</small>` : '';
+            placeholder.innerHTML = `<strong>🖼 图片资源：</strong><br>${escapeHtml(part.asset_pointer || '未知资源')}<br><em>原导出未包含图像，仅作占位。</em>${altText}`;
+            contentContainer.appendChild(placeholder);
+          }
+        });
+
+        if(role === 'user'){
+          const controls = buildBranchControls(conversation, nodeId);
+          if(controls){
+            bubble.appendChild(controls);
+          }
+        }
+
+        timelineFragment.appendChild(row);
+        hasRenderableNode = true;
+
+        if(typeof create_time === 'number'){
+          if(firstTimestamp === null || create_time < firstTimestamp){
+            firstTimestamp = create_time;
+          }
+          if(lastTimestamp === null || create_time > lastTimestamp){
+            lastTimestamp = create_time;
+          }
         }
       });
 
-      timelineFragment.appendChild(article);
-
-      if(role === 'user'){
-        const controls = buildBranchControls(conversation, nodeId);
-        if(controls){
-          article.appendChild(controls);
-        }
+      if(!hasRenderableNode){
+        elements.timeline.innerHTML = '<div class="timeline-empty">当前分支中没有可显示的用户或助手消息。</div>';
+        return { firstTimestamp: firstTimestamp, lastTimestamp: lastTimestamp, modelLabel: assistantModel };
       }
-    });
 
-    elements.timeline.innerHTML = '';
-    elements.timeline.appendChild(timelineFragment);
+      elements.timeline.innerHTML = '';
+      elements.timeline.appendChild(timelineFragment);
 
-    renderMathInElement(elements.timeline);
-    window.hljs.highlightAll();
-  }
+      renderMathInElement(elements.timeline);
+      window.hljs.highlightAll();
+      return { firstTimestamp, lastTimestamp, modelLabel: assistantModel };
+    }
 
   function extractPlainText(message){
     const parts = normalizeContentParts(message.content || {});
     return parts.filter(p => p.type === 'text').map(p => p.value).join(' ').slice(0, 200) || '无内容';
+  }
+
+  function getAvatarInitial(name, role){
+    const fallback = role === 'assistant' ? 'GPT' : '我';
+    if(!name || typeof name !== 'string') return fallback;
+    const trimmed = name.trim();
+    if(!trimmed) return fallback;
+    const firstCodePoint = trimmed.codePointAt(0);
+    if(firstCodePoint === undefined) return fallback;
+    const length = firstCodePoint > 0xffff ? 2 : 1;
+    const slice = trimmed.slice(0, length);
+    return /[a-zA-Z]/.test(slice) ? slice.toUpperCase() : slice;
+  }
+
+  function getRoleLabel(name, role){
+    if(role === 'assistant'){
+      return (typeof name === 'string' && name.trim()) ? name.trim() : 'ChatGPT';
+    }
+    return (typeof name === 'string' && name.trim()) ? name.trim() : '我';
+  }
+
+  function getMessageModelLabel(message){
+    const metadata = message?.metadata || {};
+    const candidates = [
+      metadata.model_slug,
+      metadata.model,
+      metadata.model_name,
+      metadata.model_display_name,
+      metadata.model_title,
+      metadata.default_model_slug
+    ];
+    for(const value of candidates){
+      if(typeof value === 'string' && value.trim()){
+        return value.trim();
+      }
+    }
+    if(metadata.model && typeof metadata.model === 'object'){
+      const { slug, name, displayName } = metadata.model;
+      const nested = slug || name || displayName;
+      if(typeof nested === 'string' && nested.trim()){
+        return nested.trim();
+      }
+    }
+    return null;
   }
 
   function resolveRootId(mapping, currentNodeId){
